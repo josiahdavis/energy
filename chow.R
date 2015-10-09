@@ -16,15 +16,26 @@ str(d)
 # Calculate the total daily usage for customer on each day
 group <- group_by(d, customer, time)
 dm <- summarise(group, gen = sum(general))
-dm <- filter(dm, month > as.Date("2013-03-01"), 
-                  month < as.Date("2014-03-01"))
+dm <- filter(dm, time > as.Date("2013-03-01"), 
+                  time < as.Date("2014-03-01"))
 
 # Plot the data with the average for each month
-ggplot(dm, aes(month, gen)) +
+ggplot(dm, aes(time, gen)) +
   geom_point(alpha = 1/2) +
   geom_smooth() +
   scale_size_area() + 
-  scale_x_date(breaks = seq.Date(min(dm$month), max(dm$month), "month"))
+  scale_x_date(breaks = seq.Date(min(dm$time), max(dm$time), "month"))
+
+# Plot the data against the Min temperature
+ggplot(d, aes(min, general)) + 
+  geom_point(alpha = 1/2) + 
+  geom_smooth()
+
+# Plot the data against the Max temperature
+ggplot(d, aes(max, general)) + 
+  geom_point(alpha = 1/2) + 
+  geom_smooth()
+
 
 # Choose a breaking point for the chow test (arbitrary for now)
 breakPoint <- as.Date("2013-09-01")
