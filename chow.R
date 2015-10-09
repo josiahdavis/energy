@@ -37,14 +37,13 @@ ggplot(d, aes(max, general)) +
   geom_point(alpha = 1/2) + 
   geom_smooth()
 
-
 # Choose a breaking point for the chow test (arbitrary for now)
 breakPoint <- as.Date("2013-09-01")
 
 ## Create a linear regression
-mc = lm(gen ~ month, data = dm)
-m1 = lm(gen ~ month, data = dm[dm$month <= breakPoint,])
-m2 = lm(gen ~ month, data = dm[dm$month > breakPoint,])
+mc = lm(general ~ time, data = d)
+m1 = lm(general ~ time, data = d[d$time <= breakPoint,])
+m2 = lm(general ~ time, data = d[d$time > breakPoint,])
 
 # Calculate the chow test statistic
 # Reference: https://en.wikipedia.org/wiki/Chow_test
@@ -59,15 +58,16 @@ chow
 
 # Check for significance
 Fcrit <- qf(.99, k, N1 + N2 - 2*k)
+Fcrit
 chow > Fcrit 
 1 - pf(chow, k, N1 + N2 - 2*k)
 
 # Visualize lines of best fit
-ggplot(dm, aes(month, gen)) +
+ggplot(d, aes(time, general)) +
   geom_point(alpha = 1/4) +
   scale_size_area() + 
   stat_smooth(method="lm", se=FALSE, color = "#1f77b4") + 
-  stat_smooth(data = dm[dm$month <= breakPoint,], method="lm", se=TRUE, color = "#ff7f0e") + 
-  stat_smooth(data = dm[dm$month > breakPoint,], method="lm", se=TRUE, color = "#2ca02c") + 
-  scale_x_date(breaks = seq.Date(min(dm$month), max(dm$month), "quarter")) + 
+  stat_smooth(data = d[d$time <= breakPoint,], method="lm", se=TRUE, color = "#ff7f0e") + 
+  stat_smooth(data = d[d$time > breakPoint,], method="lm", se=TRUE, color = "#2ca02c") + 
+  scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter")) + 
   scale_y_continuous(limits = c(-0, 1500))
