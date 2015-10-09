@@ -23,7 +23,7 @@ dm <- filter(dm, month > as.Date("2013-03-01"),
 
 # Plot the data with the average for each month
 ggplot(dm, aes(month, gen)) +
-  geom_point(alpha = 1/4) +
+  geom_point(alpha = 1/2) +
   geom_smooth() +
   scale_size_area() + 
   scale_x_date(breaks = seq.Date(min(dm$month), max(dm$month), "month"))
