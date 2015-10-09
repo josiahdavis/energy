@@ -3,20 +3,18 @@ library(dplyr)
 library(ggplot2)
 
 # Read in the data
-fileLoc <- "C:/Users/josiahd/Documents/PGandE/"
-d <-read.csv(paste(fileLoc, "electricity.csv", sep="")) 
-names(d) <- c("customer", "time", "general", "offPeak", "grossGen", "netGen")
-str(d)
+fileLoc <- "C:/Users/josiahd/Documents/PGE/energy/"
+d <-read.csv(paste(fileLoc, "data.csv", sep="")) 
+d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "max_Monthly", "min_Monthly")]
+names(d) <- c("customer", "time", "general", "max", "min")
+
 
 # Format and add variables
-d$time <- as.Date(d$time, "%d/%m/%Y %H:%M")
-d$customer <- as.factor(d$customer)
-d$month <- as.Date(
-              paste0("01-",strftime(d$time, format="%m-%Y")), 
-              "%d-%m-%Y")
+d$time <- as.Date(paste0("01-", d$time), "%d-%m-%Y")
+str(d)
   
 # Calculate the total daily usage for customer on each day
-group <- group_by(d, customer, month)
+group <- group_by(d, customer, time)
 dm <- summarise(group, gen = sum(general))
 dm <- filter(dm, month > as.Date("2013-03-01"), 
                   month < as.Date("2014-03-01"))
