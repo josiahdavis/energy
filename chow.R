@@ -10,8 +10,8 @@ library(ggplot2)
 fileLoc <- "C:/Users/josiahd/Documents/PGE/energy/"
 fileLoc <- "/Users/josiahdavis/Documents/GitHub/energy/"
 d <-read.csv(paste(fileLoc, "data.csv", sep="")) 
-d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "max_Monthly", "min_Monthly")]
-names(d) <- c("customer", "time", "general", "max", "min")
+d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "hdd", "cdd")]
+names(d) <- c("customer", "time", "general", "hdd", "cdd")
 
 
 # Format variables and subset time interval
@@ -24,19 +24,20 @@ str(d)
 # Plot usage across time
 ggplot(d, aes(time, general)) +
   geom_point(alpha = 1/4) +
-  geom_smooth() +
+  geom_smooth(method="lm") +
   scale_size_area() + 
   scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter"))
-
-# Plot usage against min temperature
-ggplot(d, aes(min, general)) + 
+ 
+# Evaluate  usage against cooling degree days (cdd)
+ggplot(d, aes(cdd, general)) + 
   geom_point(alpha = 1/4) + 
-  geom_smooth()
+  geom_smooth(method="lm")
 
-# Plot usage against max temperature
-ggplot(d, aes(max, general)) + 
+# Evaluate usage against heating degree days
+ggplot(d, aes(hdd, general)) + 
   geom_point(alpha = 1/4) + 
-  geom_smooth()
+  geom_smooth(method="lm")
+
 
 # Choose a breaking point for the chow test (arbitrary for now)
 breakPoint <- as.Date("2013-09-01")
