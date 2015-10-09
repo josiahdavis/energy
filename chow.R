@@ -1,3 +1,7 @@
+# ===================================
+# READ IN DATA AND FORMAT
+# ===================================
+
 # Clear working space
 rm(list = ls())
 gc()
@@ -21,23 +25,32 @@ d <- filter(d, time >= as.Date("2012-05-01"),
 
 str(d)
 
+# ===================================
+# EVALUATE USAGE AND HDD/CDD
+# ===================================
+
+# Evaluate  usage against cooling degree days (cdd)
+ggplot(d, aes(cdd, general)) + 
+  geom_point(alpha = 1/4) + 
+  geom_smooth(method="lm")
+summary(lm(general ~ cdd, d))
+
+# Evaluate usage against heating degree days
+ggplot(d, aes(hdd, general)) + 
+  geom_point(alpha = 1/4) + 
+  geom_smooth(method="lm")
+summary(lm(general ~ hdd, d))
+
 # Plot usage across time
 ggplot(d, aes(time, general)) +
   geom_point(alpha = 1/4) +
   geom_smooth(method="lm") +
   scale_size_area() + 
   scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter"))
- 
-# Evaluate  usage against cooling degree days (cdd)
-ggplot(d, aes(cdd, general)) + 
-  geom_point(alpha = 1/4) + 
-  geom_smooth(method="lm")
 
-# Evaluate usage against heating degree days
-ggplot(d, aes(hdd, general)) + 
-  geom_point(alpha = 1/4) + 
-  geom_smooth(method="lm")
-
+# ===================================
+# EVALUATE STRUCTURAL BREAK
+# ===================================
 
 # Choose a breaking point for the chow test (arbitrary for now)
 breakPoint <- as.Date("2013-09-01")
