@@ -84,12 +84,12 @@ tempHistoricCombine <- tempHistoricMax %>%
 tempHistoricSub <- tempHistoricCombine %>% 
   mutate(month_Year = paste(Month, Year, sep = "-")) %>% # create new variables
   group_by(month_Year) %>% # group by year and month year dummy
-  summarise(max_Monthly = max(MaxTempF), # find highest temp per month
-            min_Monthly = min(MinTempF), # find lowest temp per month
+  summarise(max_Monthly = max(MaxTempF, na.rm = TRUE), # find highest temp per month
+            min_Monthly = min(MinTempF, na.rm = TRUE), # find lowest temp per month
             hdd = sum(HDD), # sum hdd
             cdd = sum(CDD), # sum cdd
-            median_temp = median(c(MaxTempF, MinTempF)), #median daily temp
-            median_High = median(MaxTempF), # median high
+            median_temp = median(c(MaxTempF, MinTempF), na.rm = TRUE), #median daily temp
+            median_High = median(MaxTempF, na.rm = TRUE), # median high
             median_Low = round(median(MinTempF),0), # median low
             measured_Days = n(), # measured days per month
             days_80 = sum(MaxTempF > 80), # days max temp was above 80
@@ -105,6 +105,7 @@ head(tempHistoricSub)
 # summarize sample meter and combine with sydney observatory data 
 meterSampleSub <- meterSample %>% 
   select(CUSTOMER_KEY, Month, Year, General.Supply.KWH:Net.Generation.KWH) %>% 
+  filter(!is.na(CUSTOMER_KEY)) %>% # remove NA values
   mutate(month_Year = paste(Month, Year, sep = "-")) %>% # create new variables
   group_by(CUSTOMER_KEY, Year, month_Year) %>% 
   summarize(general_KWH = sum(General.Supply.KWH),
@@ -117,3 +118,7 @@ meterSampleSub <- meterSample %>%
 # Export to CSV -----------------------------------------------------------
 
 write.csv(x = meterSampleSub, file = "data.csv",row.names = FALSE)
+
+table(is.na(meterSampleSub))
+tempHistoricSub[tempHistoricSub$hdd != 0,]
+meterSampleSub[is.na(meterSampleSub),]
