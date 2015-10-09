@@ -8,6 +8,7 @@ library(ggplot2)
 
 # Read in the data
 fileLoc <- "C:/Users/josiahd/Documents/PGE/energy/"
+fileLoc <- "/Users/josiahdavis/Documents/GitHub/energy/"
 d <-read.csv(paste(fileLoc, "data.csv", sep="")) 
 d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "max_Monthly", "min_Monthly")]
 names(d) <- c("customer", "time", "general", "max", "min")
@@ -22,19 +23,19 @@ str(d)
 
 # Plot usage across time
 ggplot(d, aes(time, general)) +
-  geom_point(alpha = 1/2) +
+  geom_point(alpha = 1/4) +
   geom_smooth() +
   scale_size_area() + 
   scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter"))
 
 # Plot usage against min temperature
 ggplot(d, aes(min, general)) + 
-  geom_point(alpha = 1/2) + 
+  geom_point(alpha = 1/4) + 
   geom_smooth()
 
 # Plot usage against max temperature
 ggplot(d, aes(max, general)) + 
-  geom_point(alpha = 1/2) + 
+  geom_point(alpha = 1/4) + 
   geom_smooth()
 
 # Choose a breaking point for the chow test (arbitrary for now)
