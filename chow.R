@@ -1,3 +1,7 @@
+# Clear working space
+rm(list = ls())
+gc()
+
 # Import packages
 library(dplyr)
 library(ggplot2)
@@ -9,29 +13,26 @@ d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "max_Monthly", "min_Month
 names(d) <- c("customer", "time", "general", "max", "min")
 
 
-# Format and add variables
+# Format variables and subset time interval
 d$time <- as.Date(paste0("01-", d$time), "%d-%m-%Y")
-str(d)
-  
-# Calculate the total daily usage for customer on each day
-group <- group_by(d, customer, time)
-dm <- summarise(group, gen = sum(general))
-dm <- filter(dm, time > as.Date("2013-03-01"), 
+d <- filter(d, time >= as.Date("2012-05-01"), 
                   time < as.Date("2014-03-01"))
 
-# Plot the data with the average for each month
-ggplot(dm, aes(time, gen)) +
+str(d)
+
+# Plot usage across time
+ggplot(d, aes(time, general)) +
   geom_point(alpha = 1/2) +
   geom_smooth() +
   scale_size_area() + 
-  scale_x_date(breaks = seq.Date(min(dm$time), max(dm$time), "month"))
+  scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter"))
 
-# Plot the data against the Min temperature
+# Plot usage against min temperature
 ggplot(d, aes(min, general)) + 
   geom_point(alpha = 1/2) + 
   geom_smooth()
 
-# Plot the data against the Max temperature
+# Plot usage against max temperature
 ggplot(d, aes(max, general)) + 
   geom_point(alpha = 1/2) + 
   geom_smooth()
