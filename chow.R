@@ -11,7 +11,6 @@ library(dplyr)
 library(ggplot2)
 
 # Read in the data
-fileLoc <- "C:/Users/josiahd/Documents/PGE/energy/"
 fileLoc <- "/Users/josiahdavis/Documents/GitHub/energy/"
 d <-read.csv(paste(fileLoc, "data.csv", sep="")) 
 d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "hdd", "cdd")]
