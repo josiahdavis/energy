@@ -90,14 +90,17 @@ customerData$inSample <- as.factor(ifelse(customerData$CUSTOMER_KEY %in% inSampl
 # create subset of numeric values
 customerCluster <- customerData %>%
   filter(!is.na(NUM_OCCUPANTS)) %>% 
-  select(starts_with("NUM"), starts_with("IS"), starts_with("HAS"))
+  select(starts_with("NUM"))
 
+customerCluster <- na.omit(customerCluster)
+
+summary(customerCluster)
 customerCluster$NUM_OCCUPANTS <- sapply(customerCluster$NUM_OCCUPANTS, as.numeric) # change to numeric
-sapply(customerCluster, class)
+customerCluster <- sapply(customerCluster, as.numeric)
 
 # perform k means clustering
 customerK_Means4 <- kmeans(scale(customerCluster, center = FALSE), centers = 4, nstart = 50) # 77.7
-customerK_Means4$
+customerK_Means4
 customerK_Means5 <- kmeans(customerCluster, centers = 5, nstart = 50) # 80.3
 customerK_Means6 <- kmeans(customerCluster, centers = 6, nstart = 50) # 82.9
 customerK_Means7 <- kmeans(customerCluster, centers = 7, nstart = 50) # 85
@@ -107,10 +110,39 @@ customerK_Means8 <- kmeans(customerCluster, centers = 8, nstart = 50) # 86.7
 # customerCluster$CUSTOMER_KEY <- customerData$CUSTOMER_KEY[]
 # head(customerCluster)
 
+
+clusterData <- data.frame(customerK_Means4$centers[,1:6], row.names = NULL)
+clusterData$cluster <- c(1:4)
+
+ggplot(data = clusterData) +
+  geom_bar(aes(x = factor(cluster), y = NUM_OCCUPANTS, fill = factor(cluster)), stat = "identity") +
+  scale_fill_discrete("Cluster Number") +
+  xlab("cluster numbers") +
+  ggtitle("number of occupants")
+
+ggplot(data = clusterData) +
+  geom_bar(aes(x = factor(cluster), y = NUM_CHILDREN_0_10, fill = factor(cluster)), stat = "identity") +
+  scale_fill_discrete("Cluster Number") +
+  ggtitle("number of children 0 - 10") +
+  xlab("cluster numbers")
+
+ggplot(data = clusterData) +
+  geom_bar(aes(x = factor(cluster), y = NUM_ROOMS_HEATED, fill = factor(cluster)), stat = "identity") +
+  scale_fill_discrete("Cluster Number") +
+  ggtitle("number of rooms heated") +
+  xlab("cluster numbers")
+  
+ggplot(data = clusterData) +
+  geom_bar(aes(x = factor(cluster), y = NUM_OCCUPANTS_70PLUS, fill = factor(cluster)), stat = "identity") +
+  scale_fill_discrete("Cluster Number") +
+  xlab("cluster numbers") +
+  ggtitle("number of 70+")
+
+
 # Graph based on k-means
 library(cluster)
 clusplot(customerCluster,  # data frame
-         customerK_Means8$cluster,  # cluster data
+         customerK_Means4$cluster,  # cluster data
          color = TRUE,  # color
          #          shade = TRUE,  # Lines in clusters
          lines = 3,  # Lines connecting centroids
@@ -119,6 +151,7 @@ clusplot(customerCluster,  # data frame
 # first plots 
 plot.kmeans(customerK_Means4, data = customerCluster)
 
+library(useful)
 
 plot.kmeans(wineK3, data = wineTrain)
 pg <- plot.kmeans(wineK3, data = wine, class = "Cultivar", shape = cluster)
