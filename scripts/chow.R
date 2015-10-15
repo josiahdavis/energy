@@ -12,13 +12,13 @@ library(ggplot2)
 
 # Read in the data
 fileLoc <- "/Users/josiahdavis/Documents/GitHub/energy/"
-d <-read.csv(paste(fileLoc, "data.csv", sep="")) 
-d <- d[,c("CUSTOMER_KEY", "month_Year", "general_KWH", "hdd", "cdd")]
+d <-read.csv(paste(fileLoc, "dataDaily.csv", sep="")) 
+d <- d[,c("CUSTOMER_KEY", "yearMonthDay", "general_KWH", "hdd", "cdd")]
 names(d) <- c("customer", "time", "general", "hdd", "cdd")
 
 
 # Format variables and subset time interval
-d$time <- as.Date(paste0("01-", d$time), "%d-%m-%Y")
+d$time <- as.Date(d$time, "%Y-%m-%d")
 d <- filter(d, time >= as.Date("2012-05-01"), 
                   time < as.Date("2014-03-01"))
 
@@ -29,15 +29,21 @@ str(d)
 # ===================================
 
 # Evaluate  usage against cooling degree days (cdd)
-ggplot(d, aes(cdd, general)) + 
+ggplot(d[d$cdd > 0,], aes(cdd, general)) + 
   geom_point(alpha = 1/4) + 
-  geom_smooth(method="lm")
+  geom_smooth(method="lm") + 
+  ggtitle("Relationship between Electricity Usage and Cooling Degree Days")  + 
+  scale_x_continuous(name="Cooling Degree Days") + 
+  scale_y_continuous(name="Electricity Usage")
 summary(lm(general ~ cdd, d))
 
 # Evaluate usage against heating degree days
-ggplot(d, aes(hdd, general)) + 
+ggplot(d[(d$hdd > 0) & (d$hdd < 2.5),], aes(hdd, general)) + 
   geom_point(alpha = 1/4) + 
-  geom_smooth(method="lm")
+  geom_smooth(method="lm") + 
+  ggtitle("Relationship between Electricity Usage and Heating Degree Days") + 
+  scale_x_continuous(name="Heating Degree Days") + 
+  scale_y_continuous(name="Electricity Usage")
 summary(lm(general ~ hdd, d))
 
 # Plot usage across time
@@ -45,7 +51,9 @@ ggplot(d, aes(time, general)) +
   geom_point(alpha = 1/4) +
   geom_smooth(method="lm") +
   scale_size_area() + 
-  scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter"))
+  scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter")) + 
+  ggtitle("Electricity Usage Over Time") 
+summary(lm(general ~ time, d))
 
 # ===================================
 # EVALUATE STRUCTURAL BREAK
@@ -78,10 +86,10 @@ chow > Fcrit
 
 # Visualize lines of best fit
 ggplot(d, aes(time, general)) +
-  geom_point(alpha = 1/4) +
+  geom_point(alpha = 1/10) +
   scale_size_area() + 
-  stat_smooth(method="lm", se=FALSE, color = "#1f77b4") + 
-  stat_smooth(data = d[d$time <= breakPoint,], method="lm", se=TRUE, color = "#ff7f0e") + 
-  stat_smooth(data = d[d$time > breakPoint,], method="lm", se=TRUE, color = "#2ca02c") + 
-  scale_x_date(breaks = seq.Date(min(d$time), max(d$time), "quarter")) + 
-  scale_y_continuous(limits = c(-0, 1500))
+  stat_smooth(method="lm", se=FALSE, color = "#1f77b4", size = 1.1) + 
+  stat_smooth(data = d[d$time <= breakPoint,], method="lm", size = 1.1, se=TRUE, color = "#ff7f0e") + 
+  stat_smooth(data = d[d$time > breakPoint,], method="lm", size = 1.1, se=TRUE, color = "#2ca02c") + 
+  scale_x_date(name = "Time", breaks = seq.Date(min(d$time), max(d$time), "quarter")) + 
+  scale_y_continuous(name="Electricity Usage", limits = c(0, 70))

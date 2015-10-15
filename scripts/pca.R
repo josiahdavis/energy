@@ -2,11 +2,9 @@
 # Dimension Reduction of Usage Data
 # ====================================
 
-# Clear working space
+# Clear working space and load packages
 rm(list = ls()); gc()
-
 library(ggplot2)
-library(dplyr)
 
 # ====================================
 # READ DATA AND FORMAT
