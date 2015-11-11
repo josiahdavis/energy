@@ -8,10 +8,10 @@ rm(list = ls()); gc()
 # Import packages
 library(dplyr)
 library(ggplot2)
-
+getwd()
 # Read in the data 
 fileLoc <- "/Users/josiahdavis/Documents/GitHub/energy/"
-d <-read.csv(paste(fileLoc, "smallelectricitytimeofusedataset.csv", sep="")) 
+d <-read.csv("./data/smallelectricitytimeofusedataset.csv", sep="")
 d <- d[,1:3]
 names(d) <- c("customer", "datetime", "usage")
 
